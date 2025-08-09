@@ -19,7 +19,6 @@ function App() {
     }
   }, []);
   
-  // Use the live backend URL
   const BACKEND_URL = 'https://influence-os-project.onrender.com';
 
   const handleLogin = () => {
@@ -48,11 +47,18 @@ function App() {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || 'An error occurred.');
+      if (!response.ok) {
+        throw new Error(data.detail || 'An error occurred while posting.');
+      }
       setMessage('Post successfully published to LinkedIn!');
       setPrompt('');
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      console.error("Full error object:", error);
+      let errorMessage = "An unknown error occurred.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setMessage(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }

@@ -11,8 +11,8 @@ from pathlib import Path
 
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-# Use absolute imports for Render deployment
-from . import models,database
+# Use relative imports for local development
+from . import models, database
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -27,9 +27,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file="backend/.env")
 
 settings = Settings()
-# Use the live Render URLs for the final version
-REDIRECT_URI = "https://influence-os-project.onrender.com/auth/callback"
-FRONTEND_URL = "https://influence-os-frontend.onrender.com"
+# Use local URLs for local development
+REDIRECT_URI = "http://127.0.0.1:8000/auth/callback"
+FRONTEND_URL = "http://localhost:5173"
 
 app = FastAPI(
     title="Influence OS Agent Backend",
@@ -37,8 +37,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow the live frontend to communicate with the backend
-origins = [FRONTEND_URL]
+# Allow the local frontend to communicate with the backend
+origins = [FRONTEND_URL, "https://influence-os-frontend.onrender.com"] # Allow both
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins, allow_credentials=True,
@@ -87,10 +87,18 @@ def auth_callback(code: Optional[str] = Query(None), db: Session = Depends(get_d
         return RedirectResponse(url=final_frontend_url)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        # Provide more detail on the error
+        error_detail = f"An error occurred: {str(e)}"
+        if hasattr(e, 'response') and e.response is not None:
+            error_detail += f" - Response: {e.response.text}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @app.post("/posts/create")
 def create_linkedin_post(post_data: PostCreate):
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    from langchain.prompts import PromptTemplate
+    from langchain.chains import LLMChain
+
     llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", google_api_key=settings.google_api_key)
     template = "You are an expert LinkedIn thought leader writing for {user_name}. Your tone should be professional and insightful. Based on the following prompt, write a concise LinkedIn post with 3-5 relevant hashtags.\n\nPROMPT: \"{user_prompt}\"\n\nLINKEDIN POST:"
     prompt_template = PromptTemplate(template=template, input_variables=["user_name", "user_prompt"])
