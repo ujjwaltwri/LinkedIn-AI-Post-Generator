@@ -12,7 +12,7 @@ from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 # Use relative imports for local development
-from . import models, database
+import models, database
 
 models.Base.metadata.create_all(bind=database.engine)
 
