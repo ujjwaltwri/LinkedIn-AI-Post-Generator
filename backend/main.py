@@ -14,7 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Database imports
 from sqlalchemy.orm import Session
-from . import models, database
+import models, database
 
 # LangChain and AI imports
 from langchain_google_genai import ChatGoogleGenerativeAI
