@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+# This line uses the simple SQLite database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./influence_os.db"
 
 engine = create_engine(
