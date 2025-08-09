@@ -5,22 +5,21 @@ function App() {
   const [prompt, setPrompt] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [user, setUser] = useState(null); // State to store user info
+  const [user, setUser] = useState(null);
 
-  // This effect runs once when the component loads
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const userId = params.get('user_id');
+    const accessToken = params.get('access_token');
+    const linkedinId = params.get('linkedin_id');
     const userName = params.get('name');
 
-    if (userId && userName) {
-      // If user info is in the URL, save it to state
-      setUser({ id: userId, name: userName });
-      // Clean the URL
+    if (accessToken && linkedinId && userName) {
+      setUser({ token: accessToken, id: linkedinId, name: userName });
       window.history.replaceState({}, document.title, "/");
     }
   }, []);
   
+  // Use the live backend URL
   const BACKEND_URL = 'https://influence-os-project.onrender.com';
 
   const handleLogin = () => {
@@ -41,17 +40,15 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: user.id,
           prompt: prompt,
+          access_token: user.token,
+          linkedin_id: user.id,
+          user_name: user.name,
         }),
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || 'An error occurred.');
-      }
-
+      if (!response.ok) throw new Error(data.detail || 'An error occurred.');
       setMessage('Post successfully published to LinkedIn!');
       setPrompt('');
     } catch (error) {
@@ -65,13 +62,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Influence OS AI Agent</h1>
-        {user ? (
-          <p>Welcome, {user.name}!</p>
-        ) : (
-          <p>Automate your LinkedIn Personal Branding</p>
-        )}
+        {user ? <p>Welcome, {user.name}!</p> : <p>Automate your LinkedIn Personal Branding</p>}
       </header>
-
       <main className="App-main">
         {user ? (
           <>
