@@ -21,7 +21,7 @@ function App() {
     }
   }, []);
   
-  const BACKEND_URL = 'http://127.0.0.1:8000';
+  const BACKEND_URL = 'https://influence-os-project.onrender.com';
 
   const handleLogin = () => {
     window.location.href = `${BACKEND_URL}/login/linkedin`;
