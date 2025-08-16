@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/ujjwaltiwari/influence-os-project/backend/venv"
+VIRTUAL_ENV="/Users/ujjwaltiwari/Desktop/influence-os-project/backend/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

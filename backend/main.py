@@ -11,25 +11,25 @@ from pathlib import Path
 
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-# Use relative imports for local development
-import models, database
+# Use absolute imports for production
+import models
+import database
 
 models.Base.metadata.create_all(bind=database.engine)
 
-# This configuration explicitly tells the server where to find the .env file
+# This configuration tells the server where to find the .env file
 class Settings(BaseSettings):
     linkedin_client_id: str
     linkedin_client_secret: str
     google_api_key: str
     
-    # For Render, it will use environment variables.
-    # For local, it will look for a file named '.env' in the 'backend' folder.
+    # Render will use environment variables. This path is for local execution.
     model_config = SettingsConfigDict(env_file="backend/.env")
 
 settings = Settings()
-# Use local URLs for local development
-REDIRECT_URI = "http://127.0.0.1:8000/auth/callback"
-FRONTEND_URL = "http://localhost:5173"
+# Use the live Render URLs for the final version
+REDIRECT_URI = "https://influence-os-project.onrender.com/auth/callback"
+FRONTEND_URL = "https://influence-os-frontend.onrender.com"
 
 app = FastAPI(
     title="Influence OS Agent Backend",
@@ -37,8 +37,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow the local frontend to communicate with the backend
-origins = [FRONTEND_URL, "https://influence-os-frontend.onrender.com"] # Allow both
+# Allow the live frontend to communicate with the backend
+origins = [FRONTEND_URL, "http://localhost:5173"] # Allow both local and live
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins, allow_credentials=True,
@@ -57,6 +57,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.get("/")
+def read_root():
+    return RedirectResponse(url=FRONTEND_URL)
 
 @app.get("/login/linkedin")
 def login_linkedin():
@@ -87,7 +91,6 @@ def auth_callback(code: Optional[str] = Query(None), db: Session = Depends(get_d
         return RedirectResponse(url=final_frontend_url)
 
     except Exception as e:
-        # Provide more detail on the error
         error_detail = f"An error occurred: {str(e)}"
         if hasattr(e, 'response') and e.response is not None:
             error_detail += f" - Response: {e.response.text}"
