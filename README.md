@@ -4,7 +4,7 @@ An autonomous AI agent that uses generative AI to create and publish engaging co
 🚀 Live Demo
 You can try the live application here:
 
-https://influence-os-frontend.onrender.com
+https://linkedin-ai-post-generator.onrender.com
 
 ✨ Features
 Secure LinkedIn Authentication: Connect your LinkedIn account securely using the official OAuth 2.0 protocol.
