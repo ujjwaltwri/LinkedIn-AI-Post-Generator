@@ -19,7 +19,8 @@ function App() {
     }
   }, []);
   
-  const BACKEND_URL = 'https://influence-os-project.onrender.com';
+  // --- THIS URL HAS BEEN CORRECTED ---
+  const BACKEND_URL = 'https://influence-os-project.onrender.com'; 
 
   const handleLogin = () => {
     window.location.href = `${BACKEND_URL}/login/linkedin`;
@@ -67,8 +68,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Influence OS AI Agent</h1>
-        {user ? <p>Welcome, {user.name}!</p> : <p>Automate your LinkedIn Personal Branding</p>}
+        <h1>LinkedIn AI Post Generator</h1>
+        {user ? <p>Welcome, {user.name}!</p> : <p>Automate your Personal Branding</p>}
       </header>
       <main className="App-main">
         {user ? (
